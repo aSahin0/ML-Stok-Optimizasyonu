@@ -48,6 +48,19 @@ Bu projenin temel yetenekleri şunlardır:
 
 ---
 
+## 🔬 İleri Seviye Araştırma: Pekiştirmeli Öğrenme Deneyi
+
+Bu projenin bir parçası olarak, geleneksel ROP/EOQ politikalarına bir alternatif olarak, kendi kendine en iyi sipariş politikasını öğrenen bir Yapay Zeka Ajanı geliştirme denemesi yapılmıştır.
+
+* **Yöntem:** Temel bir Pekiştirmeli Öğrenme algoritması olan **Q-Learning** kullanılmıştır.
+* **Amaç:** Ajanın, bir simülasyon ortamında deneme-yanılma yoluyla toplam envanter maliyetini (stok tutma + sipariş + stoksuz kalma cezası) minimize eden bir strateji öğrenmesi hedeflenmiştir.
+* **Sonuç:** Yapılan deneyler, problemin doğasındaki **gecikmeli ödül yapısı** ve **geniş durum uzayı** gibi karmaşıklıklar nedeniyle, basit tablo tabanlı Q-Learning'in bu problem için verimli bir politika öğrenemediğini göstermiştir. Bu deney, problemin daha gelişmiş **Derin Pekiştirmeli Öğrenme (Deep RL)** mimarileri gerektirdiğini ortaya koymuştur.
+* **Karar:** Bu Ar-Ge çalışmasının sonucunda, projenin mevcut hali için en sağlam, güvenilir ve kanıtlanabilir çözümü sunan **Ensemble (Ortalama)** modelinin kullanılmasına karar verilmiştir.
+
+---
+
+---
+
 ## 🛠️ Teknoloji Mimarisi
 
 ![Pandas](https://img.shields.io/badge/Pandas-2.0.3-150458?style=for-the-badge&logo=pandas)

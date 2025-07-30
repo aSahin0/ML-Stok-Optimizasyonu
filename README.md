@@ -3,20 +3,17 @@
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)
 ![Libraries](https://img.shields.io/badge/Libraries-Pandas%20%7C%20Scikit--learn%20%7C%20LightGBM%20%7C%20Prophet%20%7C%20Optuna-orange)
 ![Framework](https://img.shields.io/badge/Framework-Streamlit-red)
-![License](https://img.shields.io/badge/License-MIT-green)
+
 
 > Sipariş bazlı (Make-to-Order) üretim senaryoları için geliştirilmiş, talep tahminlerini optimize ederek stok maliyetlerini düşüren ve üretim devamlılığını sağlayan otonom bir karar destek sistemi.
 
-Bu proje, ASPİLSAN gibi savunma sanayii ve teknoloji firmalarının karmaşık tedarik zinciri ve üretim süreçleri göz önünde bulundurularak, sentetik veriler üzerinde bir Kavram Kanıtlama (PoC) çalışması olarak geliştirilmiştir.
+Bu proje,  Teknoloji firmalarının karmaşık tedarik zinciri ve üretim süreçleri göz önünde bulundurularak, sentetik veriler üzerinde bir Kavram Kanıtlama (PoC) çalışması olarak geliştirilmiştir.
 
 ---
 
 ## 🖼️ İnteraktif Dashboard
 
 Sistem, tüm analiz sonuçlarını ve politika önerilerini kullanıcı dostu bir arayüzde sunar. Kullanıcılar, farklı tahmin modellerini (LightGBM, Prophet, Ensemble) anlık olarak karşılaştırabilir ve sonuçları görsel olarak inceleyebilir.
-
-![Dashboard Ekran Görüntüsü](image_df6524.png)
-*(Not: Bu görüntünün çalışması için `image_df6524.png` dosyasının projenin ana klasöründe olduğundan emin olun.)*
 
 ---
 
@@ -26,7 +23,6 @@ Sistem, tüm analiz sonuçlarını ve politika önerilerini kullanıcı dostu bi
 * [Teknoloji Mimarisi](#-teknoloji-mimarisi)
 * [Proje Yapısı](#-proje-yapısı)
 * [Kurulum ve Çalıştırma](#-kurulum-ve-çalıştırma)
-* [Lisans](#-lisans)
 
 ---
 
@@ -72,7 +68,7 @@ Stok_Optimizasyon_Projesi/
 ├── config.py              # Tüm ayarların ve parametrelerin merkezi
 ├── 00_simulate_inventory.py # Stok durumunu simüle eden yardımcı script
 ├── 01_generate_data.py    # Yapay veri setlerini üreten script
-├── 03_daily_alert_check.py  # Otomatik e-posta uyarı sistemi
+├── 03_daily_alert_check.py  # Otomatik e-posta uyarı sistemi    -----> Sonradan eklenecek
 ├── inventory_toolkit.py   # Tüm analiz fonksiyonlarını içeren araç kutusu
 ├── dashboard.py           # Streamlit interaktif dashboard uygulaması
 ├── requirements.txt       # Gerekli Python kütüphaneleri
@@ -110,6 +106,4 @@ Bu komut, tarayıcınızda projenin web arayüzünü otomatik olarak açacaktır
 
 ---
 
-## 📜 Lisans
 
-Bu proje, MIT Lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakabilirsiniz. (Not: Projenize bir LİSANS dosyası eklemeniz iyi bir pratiktir.)

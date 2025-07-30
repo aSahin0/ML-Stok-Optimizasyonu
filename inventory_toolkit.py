@@ -201,3 +201,73 @@ def train_and_forecast_with_prophet(df_model_data):
     future_forecast_only = full_forecast[full_forecast['ds'] > df_prophet['ds'].max()] # Sadece gerçek gelecek günlerini al
     
     return model_prophet, mae, future_forecast_only, test_forecast, df_test, full_forecast
+
+# inventory_toolkit.py dosyasının sonuna ekleyin
+
+def run_inventory_simulation(daily_demands, policy, lead_time, holding_cost_per_unit, order_cost):
+    """
+    Belirli bir stok politikası altında envanter sisteminin simülasyonunu çalıştırır.
+    
+    :param daily_demands: Günlük talepleri içeren bir pandas Series.
+    :param policy: (ROP, EOQ) değerlerini içeren bir tuple.
+    :param lead_time: Tedarik süresi (gün).
+    :param holding_cost_per_unit: Birim başına YILLIK stok tutma maliyeti.
+    :param order_cost: Sipariş başına maliyet.
+    :return: Performans metriklerini içeren bir sözlük.
+    """
+    rop, eoq = policy
+    
+    # EOQ 0 ise simülasyon anlamsızdır, maliyetleri 0 kabul et.
+    if eoq == 0:
+        return {
+            "Toplam Maliyet (TL)": 0, "Stok Tutma Maliyeti (TL)": 0,
+            "Sipariş Maliyeti (TL)": 0, "Hizmet Seviyesi (%)": 0
+        }
+
+    # Başlangıç durumu
+    inventory_level = rop + eoq  # Simülasyona dolu stokla başlayalım
+    on_order_count = 0
+    order_arrival_days = []
+    
+    total_holding_cost = 0
+    total_order_cost = 0
+    total_demand = 0
+    unmet_demand = 0
+    
+    # Simülasyon periyodu kadar döngü
+    for day, demand in enumerate(daily_demands):
+        # 1. Gelen sipariş var mı kontrol et
+        if day in order_arrival_days:
+            inventory_level += eoq
+            on_order_count -= 1
+            order_arrival_days.remove(day)
+
+        # 2. O günün talebini karşıla
+        total_demand += demand
+        units_to_ship = min(demand, inventory_level)
+        inventory_level -= units_to_ship
+        if units_to_ship < demand:
+            unmet_demand += (demand - units_to_ship)
+
+        # 3. Gün sonu stok tutma maliyetini hesapla
+        # Yıllık maliyeti günlüğe çeviriyoruz
+        total_holding_cost += inventory_level * (holding_cost_per_unit / 365) 
+
+        # 4. Stok seviyesini kontrol et ve sipariş ver
+        # Sadece bekleyen sipariş yoksa yenisini ver (basit bir sipariş politikası)
+        if inventory_level <= rop and on_order_count == 0:
+            on_order_count += 1
+            total_order_cost += order_cost
+            arrival_day = day + lead_time
+            order_arrival_days.append(arrival_day)
+            
+    # Simülasyon sonuçlarını hesapla
+    service_level = ((total_demand - unmet_demand) / total_demand) * 100 if total_demand > 0 else 100
+    total_cost = total_holding_cost + total_order_cost
+    
+    return {
+        "Toplam Maliyet (TL)": total_cost,
+        "Stok Tutma Maliyeti (TL)": total_holding_cost,
+        "Sipariş Maliyeti (TL)": total_order_cost,
+        "Hizmet Seviyesi (%)": service_level,
+    }

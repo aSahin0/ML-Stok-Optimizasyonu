@@ -32,3 +32,20 @@ ORDER_COST = 450.0  # Sipariş başına maliyet (TL)
 # --- OTOMASYON AYARLARI ---
 # Analizini otomatikleştirmek istediğimiz kritik hammaddelerin listesi
 CRITICAL_MATERIALS = ['RAW_011', 'RAW_003', 'RAW_042', 'RAW_025', 'RAW_018']
+
+# --- PEKİŞTİRMELİ ÖĞRENME (RL) AYARLARI ---
+# Q-Learning Parametreleri
+ALPHA = 0.1      # Öğrenme Oranı (Learning Rate)
+GAMMA = 0.95     # Gelecekteki Ödüllerin İndirgeme Faktörü (Discount Factor)
+EPSILON = 1.0    # Keşfetme Oranı (Exploration Rate)
+EPSILON_DECAY = 0.999 # Epsilon'un zamanla azalma oranı
+MIN_EPSILON = 0.01   # Minimum keşfetme oranı
+
+# Simülasyon ve Eğitim
+RL_TRAINING_EPISODES = 200000 # Ajanın simülasyonu kaç defa baştan sona oynayacağı
+
+# Durum ve Aksiyon Uzayı
+# Stok seviyelerini 10'ar adımlarla gruplayarak durum sayısını azaltıyoruz.
+STATE_BIN_SIZE = 1
+# Ajanın seçebileceği sipariş miktarları
+ACTION_SPACE = [0, 50, 100, 150, 200] 

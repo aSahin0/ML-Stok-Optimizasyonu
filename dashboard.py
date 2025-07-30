@@ -108,3 +108,58 @@ else:
                 st.subheader("Prophet Modelinin Bileşen Analizi")
                 fig_prophet = prophet_model.plot_components(full_forecast)
                 st.pyplot(fig_prophet)
+                st.subheader("📊 Stok Politikası Simülasyonu ve Karşılaştırma")
+        st.markdown("Oluşturulan Yapay Zeka politikasının, daha basit bir yönteme (son 30 gün ortalaması) göre performansını test edelim.")
+
+        with st.spinner('Simülasyon çalıştırılıyor...'):
+            # Simülasyon için test verisini (gerçekleşen talepleri) al
+            test_demands = y_test
+            
+            # --- Gerekli Parametreleri Al ---
+            material_info_sim = pd.read_csv(config.MATERIALS_DATA_PATH)
+            material_info_sim = material_info_sim[material_info_sim['raw_material_id'] == selected_material].iloc[0]
+            holding_cost_per_unit = material_info_sim['cost_per_unit'] * material_info_sim['holding_cost_rate']
+            lead_time = material_info_sim['supplier_lead_time_days']
+
+            # --- 1. Yapay Zeka Politikasını Simüle Et ---
+            ai_policy = (rop, eoq)
+            ai_results = itk.run_inventory_simulation(
+                daily_demands=test_demands,
+                policy=ai_policy,
+                lead_time=lead_time,
+                holding_cost_per_unit=holding_cost_per_unit,
+                order_cost=config.ORDER_COST
+            )
+            ai_results['Politika'] = f'Yapay Zeka ({model_choice})'
+
+            # --- 2. Basit (Geleneksel) Politikayı Simüle Et ---
+            # ROP = Son 30 günün ortalama talebi * Tedarik Süresi
+            simple_rop = test_demands.rolling(window=30, min_periods=1).mean().iloc[-1] * lead_time
+            # EOQ'yu aynı tutarak sadece ROP'un etkisini karşılaştıralım
+            simple_eoq = eoq 
+            simple_policy = (simple_rop, simple_eoq)
+            
+            simple_results = itk.run_inventory_simulation(
+                daily_demands=test_demands,
+                policy=simple_policy,
+                lead_time=lead_time,
+                holding_cost_per_unit=holding_cost_per_unit,
+                order_cost=config.ORDER_COST
+            )
+            simple_results['Politika'] = 'Basit Ortalama'
+            
+            # --- Sonuçları Tablolaştır ---
+            comparison_df = pd.DataFrame([ai_results, simple_results])
+            comparison_df = comparison_df[['Politika', 'Toplam Maliyet (TL)', 'Hizmet Seviyesi (%)', 'Stok Tutma Maliyeti (TL)', 'Sipariş Maliyeti (TL)']]
+            
+            st.dataframe(comparison_df.style.format("{:.2f}", subset=pd.IndexSlice[:, ['Toplam Maliyet (TL)', 'Hizmet Seviyesi (%)', 'Stok Tutma Maliyeti (TL)', 'Sipariş Maliyeti (TL)']]), use_container_width=True)
+
+            # --- Sonucu Yorumla ---
+            cost_difference = simple_results['Toplam Maliyet (TL)'] - ai_results['Toplam Maliyet (TL)']
+            
+            if cost_difference > 0 and ai_results['Toplam Maliyet (TL)'] > 0:
+                st.success(f"✔️ Yapay Zeka destekli politika, basit politikaya göre test periyodunda yaklaşık **{cost_difference:.2f} TL tasarruf** sağlamıştır.")
+            elif ai_results['Toplam Maliyet (TL)'] == 0 and simple_results['Toplam Maliyet (TL)'] > 0:
+                 st.success(f"✔️ Yapay Zeka destekli politika, bu ürün için siparişe gerek olmadığını belirterek **{simple_results['Toplam Maliyet (TL)']:.2f} TL'lik gereksiz maliyeti önlemiştir**.")
+            else:
+                st.warning(f"⚠️ Yapay Zeka destekli politika, basit politikaya göre {abs(cost_difference):.2f} TL daha maliyetli olmuştur. Modelin veya politikanın gözden geçirilmesi gerekebilir.")
